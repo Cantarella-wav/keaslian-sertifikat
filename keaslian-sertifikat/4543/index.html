@@ -41,23 +41,29 @@
                 size: A4 landscape;
                 margin: 0;
             }
-            body {
-                overflow: visible;
+
+            html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                display: block;
                 background: none;
             }
+
             #image-container {
                 width: 100%;
                 height: 100%;
-                overflow: visible;
+                display: block;
             }
+
             #previewImage {
-                width: 100%;
-                height: 100%;
-                max-width: 100%;
-                max-height: 100%;
-                border: none;
+                width: 100vw;
+                height: 100vh;
                 object-fit: contain;
-                transform: scale(1) !important;
+                border: none;
+                transform: none !important;
             }
         }
     </style>
@@ -96,9 +102,7 @@
             e.preventDefault();
             const scaleAmount = -e.deltaY > 0 ? 1.1 : 1 / 1.1;
             scale *= scaleAmount;
-
             scale = Math.min(Math.max(scale, 0.5), 2);
-
             applyTransform();
         });
 
