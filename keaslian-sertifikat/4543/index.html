@@ -91,7 +91,26 @@
         let dragDirection = null;
         let initialPinchDistance = 0;
 
+        function clamp(value, min, max) {
+            return Math.min(Math.max(value, min), max);
+        }
+
+        function limitTranslate() {
+            const containerRect = container.getBoundingClientRect();
+            const imageRect = image.getBoundingClientRect();
+
+            const scaledWidth = image.naturalWidth * scale;
+            const scaledHeight = image.naturalHeight * scale;
+
+            const maxX = Math.max(0, (scaledWidth - containerRect.width) / 2);
+            const maxY = Math.max(0, (scaledHeight - containerRect.height) / 2);
+
+            translateX = clamp(translateX, -maxX, maxX);
+            translateY = clamp(translateY, -maxY, maxY);
+        }
+
         function applyTransform() {
+            limitTranslate();
             image.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
         }
 
