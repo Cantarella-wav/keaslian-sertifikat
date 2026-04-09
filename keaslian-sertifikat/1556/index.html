@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SERTIFIKAT</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #ffffff; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden; 
+        }
+
+        #image-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; 
+            cursor: default;
+        }
+
+        #previewImage {
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+            border: 10px solid #333; 
+            box-sizing: border-box;
+            transition: transform 0.1s linear; 
+            touch-action: none; 
+        }
+        
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 0;
+            }
+            body {
+                overflow: visible;
+                background: none;
+            }
+            #image-container {
+                width: 100%;
+                height: 100%;
+                overflow: visible;
+            }
+            #previewImage {
+                width: 100%;
+                height: 100%;
+                max-width: 100%;
+                max-height: 100%;
+                border: none;
+                object-fit: contain;
+            }
+        }
+    </style>
+</head>
+<body onload="window.print()">
+
+    <div id="image-container">
+        <img id="previewImage" src="Preview.png" alt="Sertifikat Preview">
+    </div>
+
+    <script>
+        const container = document.getElementById('image-container');
+        const image = document.getElementById('previewImage');
+
+        let scale = 1;
+        let isPinching = false;
+        let initialPinchDistance = 0;
+
+        function applyTransform() {
+            image.style.transform = `scale(${scale})`;
+        }
+
+        // ZOOM pakai scroll (PC)
+        container.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const scaleAmount = -e.deltaY > 0 ? 1.1 : 1 / 1.1;
+            scale *= scaleAmount;
+            applyTransform();
+        });
+
+        // ZOOM pakai pinch (HP)
+        function getDistance(touches) {
+            const [t1, t2] = touches;
+            return Math.sqrt(
+                Math.pow(t1.clientX - t2.clientX, 2) +
+                Math.pow(t1.clientY - t2.clientY, 2)
+            );
+        }
+
+        container.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                isPinching = true;
+                initialPinchDistance = getDistance(e.touches);
+            }
+        });
+
+        container.addEventListener('touchmove', (e) => {
+            if (isPinching && e.touches.length === 2) {
+                e.preventDefault();
+                const currentDistance = getDistance(e.touches);
+                const scaleAmount = currentDistance / initialPinchDistance;
+                scale *= scaleAmount;
+                initialPinchDistance = currentDistance;
+                applyTransform();
+            }
+        });
+
+        container.addEventListener('touchend', () => {
+            isPinching = false;
+        });
+    </script>
+
+</body>
+</html>
