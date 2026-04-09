@@ -24,22 +24,28 @@
             margin: 40px auto;
             border: 10px solid black;
             box-sizing: border-box;
-            background-image: url('Preview.png');
-            background-size: cover;
-            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         @media (max-width: 768px) {
-            .wrapper {
-                overflow-x: auto;
-            }
-
             .container {
                 width: 100%;
                 height: auto;
                 aspect-ratio: 1000 / 700;
                 margin: 0;
                 border: none;
+            }
+
+            .container img {
+                object-fit: contain;
             }
         }
 
@@ -62,9 +68,12 @@
                 height: 100vh;
                 margin: 0;
                 border: none;
-                background-size: contain;
-                background-repeat: no-repeat;
-                background-position: center;
+            }
+
+            .container img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
             }
         }
     </style>
@@ -73,7 +82,9 @@
 <body onload="window.print()">
 
     <div class="wrapper">
-        <div class="container"></div>
+        <div class="container">
+            <img src="Preview.png" alt="Sertifikat">
+        </div>
     </div>
 
 </body>
