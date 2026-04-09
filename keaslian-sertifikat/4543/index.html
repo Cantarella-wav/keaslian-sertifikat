@@ -7,12 +7,12 @@
     <style>
         body {
             margin: 0;
-            background-color: #ffffff; 
+            background-color: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            overflow: hidden; 
+            overflow: hidden;
         }
 
         #image-container {
@@ -21,7 +21,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden; 
+            overflow: hidden;
             cursor: grab;
         }
 
@@ -30,12 +30,12 @@
             height: auto;
             max-width: 100%;
             max-height: 100%;
-            border: 10px solid #333; 
+            border: 10px solid #333;
             box-sizing: border-box;
-            transition: transform 0.05s linear; 
-            touch-action: none; 
+            transition: transform 0.05s linear;
+            touch-action: none;
         }
-        
+
         @media print {
             @page {
                 size: A4 landscape;
@@ -87,6 +87,8 @@
 
         let startX = 0;
         let startY = 0;
+
+        let dragDirection = null;
         let initialPinchDistance = 0;
 
         function applyTransform() {
@@ -111,9 +113,7 @@
             e.preventDefault();
             const scaleAmount = -e.deltaY > 0 ? 1.1 : 1 / 1.1;
             scale *= scaleAmount;
-
             scale = Math.min(Math.max(scale, 0.5), 2);
-
             applyTransform();
         });
 
@@ -128,8 +128,9 @@
         container.addEventListener('touchstart', (e) => {
             if (e.touches.length === 1) {
                 isDragging = true;
-                startX = e.touches[0].clientX - translateX;
-                startY = e.touches[0].clientY - translateY;
+                dragDirection = null;
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
             }
 
             if (e.touches.length === 2) {
@@ -140,8 +141,25 @@
 
         container.addEventListener('touchmove', (e) => {
             if (isDragging && e.touches.length === 1) {
-                translateX = e.touches[0].clientX - startX;
-                translateY = e.touches[0].clientY - startY;
+                const currentX = e.touches[0].clientX;
+                const currentY = e.touches[0].clientY;
+
+                const dx = currentX - startX;
+                const dy = currentY - startY;
+
+                if (!dragDirection) {
+                    dragDirection = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+                }
+
+                if (dragDirection === 'x') {
+                    translateX += dx;
+                } else {
+                    translateY += dy;
+                }
+
+                startX = currentX;
+                startY = currentY;
+
                 applyTransform();
             }
 
@@ -161,6 +179,7 @@
         container.addEventListener('touchend', () => {
             isDragging = false;
             isPinching = false;
+            dragDirection = null;
         });
     </script>
 
