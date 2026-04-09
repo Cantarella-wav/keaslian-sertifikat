@@ -20,7 +20,7 @@
             height: 100%;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             overflow: hidden;
             cursor: grab;
         }
@@ -64,6 +64,19 @@
                 object-fit: contain;
                 border: none;
                 transform: none !important;
+            }
+        }
+
+        @media (max-width: 767px) {
+            #image-container {
+                justify-content: flex-start;
+                align-items: flex-start;
+            }
+
+            #previewImage {
+                width: 100%;
+                height: auto;
+                object-fit: contain;
             }
         }
     </style>
