@@ -57,6 +57,7 @@
                 max-height: 100%;
                 border: none;
                 object-fit: contain;
+                transform: scale(1) !important;
             }
         }
     </style>
@@ -80,6 +81,16 @@
         }
 
         applyTransform();
+
+        window.addEventListener('beforeprint', () => {
+            scale = 1;
+            applyTransform();
+        });
+
+        window.addEventListener('afterprint', () => {
+            scale = 0.7;
+            applyTransform();
+        });
 
         container.addEventListener('wheel', (e) => {
             e.preventDefault();
