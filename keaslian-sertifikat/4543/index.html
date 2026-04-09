@@ -4,36 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SERTIFIKAT</title>
+
     <style>
         body {
             margin: 0;
-            background-color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            padding: 0;
+            background: #fff;
+            font-family: Arial, sans-serif;
         }
 
-        #image-container {
+        .wrapper {
             width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            overflow: hidden;
-            cursor: grab;
+            overflow: auto;
         }
 
-        #previewImage {
-            width: auto;
-            height: auto;
-            max-width: 100%;
-            max-height: 100%;
-            border: 10px solid #333;
+        .container {
+            width: 1000px;
+            height: 700px;
+            margin: 40px auto;
+            border: 10px solid black;
             box-sizing: border-box;
-            transition: transform 0.05s linear;
-            touch-action: none;
+            background-image: url('Preview.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        @media (max-width: 768px) {
+            .wrapper {
+                overflow-x: auto;
+            }
+
+            .container {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 1000 / 700;
+                margin: 0;
+                border: none;
+            }
         }
 
         @media print {
@@ -42,175 +49,32 @@
                 margin: 0;
             }
 
-            html, body {
-                width: 100%;
-                height: 100%;
+            body {
                 margin: 0;
-                padding: 0;
-                overflow: hidden;
-                display: block;
-                background: none;
             }
 
-            #image-container {
-                width: 100%;
-                height: 100%;
-                display: block;
+            .wrapper {
+                overflow: visible;
             }
 
-            #previewImage {
+            .container {
                 width: 100vw;
                 height: 100vh;
-                object-fit: contain;
+                margin: 0;
                 border: none;
-                transform: none !important;
-            }
-        }
-
-        @media (max-width: 768px) {
-            #image-container {
-                justify-content: flex-start;
-                align-items: flex-start;
-            }
-
-            #previewImage {
-                width: 100%;
-                height: auto;
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
             }
         }
     </style>
 </head>
+
 <body onload="window.print()">
 
-    <div id="image-container">
-        <img id="previewImage" src="Preview.png" alt="Sertifikat Preview">
+    <div class="wrapper">
+        <div class="container"></div>
     </div>
-
-    <script>
-        const container = document.getElementById('image-container');
-        const image = document.getElementById('previewImage');
-
-        let scale = window.innerWidth <= 768 ? 1 : 0.7;
-        let translateX = 0;
-        let translateY = 0;
-
-        let isPinching = false;
-        let isDragging = false;
-
-        let startX = 0;
-        let startY = 0;
-
-        let dragDirection = null;
-        let initialPinchDistance = 0;
-
-        function clamp(value, min, max) {
-            return Math.min(Math.max(value, min), max);
-        }
-
-        function limitTranslate() {
-            const containerRect = container.getBoundingClientRect();
-            const scaledWidth = image.naturalWidth * scale;
-            const scaledHeight = image.naturalHeight * scale;
-
-            const maxX = Math.max(0, (scaledWidth - containerRect.width) / 2);
-            const maxY = Math.max(0, (scaledHeight - containerRect.height) / 2);
-
-            translateX = clamp(translateX, -maxX, maxX);
-            translateY = clamp(translateY, -maxY, maxY);
-        }
-
-        function applyTransform() {
-            limitTranslate();
-            image.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-        }
-
-        applyTransform();
-
-        window.addEventListener('beforeprint', () => {
-            scale = 1;
-            translateX = 0;
-            translateY = 0;
-            applyTransform();
-        });
-
-        window.addEventListener('afterprint', () => {
-            scale = window.innerWidth <= 768 ? 1 : 0.7;
-            applyTransform();
-        });
-
-        container.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            const scaleAmount = -e.deltaY > 0 ? 1.1 : 1 / 1.1;
-            scale *= scaleAmount;
-            scale = Math.min(Math.max(scale, 0.5), 2);
-            applyTransform();
-        });
-
-        function getDistance(touches) {
-            const [t1, t2] = touches;
-            return Math.sqrt(
-                Math.pow(t1.clientX - t2.clientX, 2) +
-                Math.pow(t1.clientY - t2.clientY, 2)
-            );
-        }
-
-        container.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1) {
-                isDragging = true;
-                dragDirection = null;
-                startX = e.touches[0].clientX;
-                startY = e.touches[0].clientY;
-            }
-
-            if (e.touches.length === 2) {
-                isPinching = true;
-                initialPinchDistance = getDistance(e.touches);
-            }
-        });
-
-        container.addEventListener('touchmove', (e) => {
-            if (isDragging && e.touches.length === 1) {
-                const currentX = e.touches[0].clientX;
-                const currentY = e.touches[0].clientY;
-
-                const dx = currentX - startX;
-                const dy = currentY - startY;
-
-                if (!dragDirection) {
-                    dragDirection = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
-                }
-
-                if (dragDirection === 'x') {
-                    translateX += dx;
-                } else {
-                    translateY += dy;
-                }
-
-                startX = currentX;
-                startY = currentY;
-
-                applyTransform();
-            }
-
-            if (isPinching && e.touches.length === 2) {
-                e.preventDefault();
-                const currentDistance = getDistance(e.touches);
-                const scaleAmount = currentDistance / initialPinchDistance;
-                scale *= scaleAmount;
-                initialPinchDistance = currentDistance;
-
-                scale = Math.min(Math.max(scale, 0.5), 2);
-
-                applyTransform();
-            }
-        });
-
-        container.addEventListener('touchend', () => {
-            isDragging = false;
-            isPinching = false;
-            dragDirection = null;
-        });
-    </script>
 
 </body>
 </html>
